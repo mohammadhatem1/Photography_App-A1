@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mohammad Eltegani | Photographer</title>
+  <meta name="description" content="Portfolio of Mohammad Eltegani, a landscape and street photographer.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="logo" href="#top">Mohammad Eltegani</a>
+            <nav aria-label="Main">
+                <ul class="nav-list">
+                    <li><a href="#work">Work</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Book a shoot</a></li>
+                </ul>
+            </nav>
+    </header>
+
+    <main id="top">
+        <section class="hero">
+            <h1>Light, weather and the people caught in it.</h1>
+            <p>Landscape and street photography, shot on film and digital.</p>
+        </section>
+
+        <section id="work" class="work" aria-labelledby="work-title">
+            <h2 id="work-title">Selected work</h2>
+            <ul class="gallery">
+                <li class="tall"><figure><img src="https://picsum.photos/id/1018/800/1200" alt="Misty mountains at dawn" loading="lazy"><figcaption>Dawn, Dolomites</figcaption></figure></li>
+                <li><figure><img src="https://picsum.photos/id/1015/1200/800" alt="River winding through a valley" loading="lazy"><figcaption>River bend</figcaption></figure></li>
+                <li><figure><img src="https://picsum.photos/id/1039/1200/800" alt="Waterfall in a green forest" loading="lazy"><figcaption>Forest falls</figcaption></figure></li>
+                <li class="wide"><figure><img src="https://picsum.photos/id/1043/1600/800" alt="Rocky coastline at dusk" loading="lazy"><figcaption>Coast at dusk</figcaption></figure></li>
+                <li><figure><img src="https://picsum.photos/id/1011/1200/800" alt="Person paddling a canoe" loading="lazy"><figcaption>Still water</figcaption></figure></li>
+                <li class="tall"><figure><img src="https://picsum.photos/id/1036/800/1200" alt="Snowy pine trees" loading="lazy"><figcaption>First snow</figcaption></figure></li>
+                <li><figure><img src="https://picsum.photos/id/1025/1200/800" alt="Pug wrapped in a blanket" loading="lazy"><figcaption>Rainy day regular</figcaption></figure></li>
+            </ul>
+        </section>
+
+        <section id="about" class="about" aria-labelledby="about-title">
+            <h2 id="about-title">About</h2>
+            <p>I'm Mohammad, a photographer based in Saudi Arabia. I shoot landscapes, street scenes and small portrait sessions, and I love early mornings and bad weather.</p>
+        </section>
+
+        <section id="contact" class="contact" aria-labelledby="contact-title">
+            <h2 id="contact-title">Book a shoot</h2>
+            <p>Tell me what you have in mind and I'll reply as fast as I can.</p>
+            <form action="#" method="post">
+                <div class="field">
+                    <label for="name">Name *</label>
+                    <input id="name" name="name" type="text" required>
+                </div>
+                <div class="field">
+                    <label for="email">Email *</label>
+                    <input id="email" name="email" type="email" required>
+                </div>
+                <div class="field">
+                    <label for="type">Type of shoot *</label>
+                    <select id="type" name="type">
+                        <option>Portrait</option>
+                        <option>Event</option>
+                        <option>Landscape commission</option>
+                    </select>
+                </div>
+                <div class="field full">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5"></textarea>
+                </div>
+                <button type="submit">Send request</button>
+            </form>
+        </section>
+    </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Mohammad Eltegani</p>
+    <a href="#top">Back to top</a>
+  </footer>
+</body>
+</html>
