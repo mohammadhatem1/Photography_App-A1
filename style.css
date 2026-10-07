@@ -6,6 +6,10 @@
   --accent: #2f5d50;
   --accent-dark: #1f4237;
   --line: #d3d9d5;
+  --surface: #ffffff;
+  --tint: #e3eae6;
+  --deep: #1f4237;
+  --deep-text: #e8f0ec;
   --gap: 1rem;
   --max: 72rem;
 }
@@ -35,10 +39,10 @@ img {
 
 h1, h2, p, ul, figure {
   margin: 0;
-  padding: 0;
 }
 
 ul {
+  padding: 0;
   list-style: none;
 }
 
@@ -55,6 +59,7 @@ a {
 .site-header {
   position: sticky;
   top: 0;
+  z-index: 10;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -88,18 +93,50 @@ a {
 }
 
 /* ---------- Layout sections ---------- */
+/* Sections span full width so backgrounds reach the edges;
+   padding-inline keeps the content centered at --max */
 .hero,
 .work,
 .about,
 .contact {
   width: 100%;
-  max-width: var(--max);
-  margin-inline: auto;
-  padding: 3rem 1.25rem;
+  padding: 3.5rem max(1.25rem, calc((100% - var(--max)) / 2));
 }
 
 .hero {
-  padding-top: 4rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+}
+
+.hero-text {
+  flex: 1 1 20rem;
+}
+
+.hero-img {
+  flex: 1 1 20rem;
+  min-width: 0;
+  height: 22rem;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.work {
+  background: var(--surface);
+}
+
+.about {
+  background: var(--tint);
+}
+
+.contact {
+  background: var(--deep);
+  color: var(--deep-text);
+}
+
+.contact > p {
+  color: var(--deep-text);
 }
 
 .hero h1 {
@@ -177,7 +214,6 @@ h2 {
 .contact > p {
   max-width: 60ch;
   margin-bottom: 1.5rem;
-  color: var(--muted);
 }
 
 .contact form {
@@ -227,6 +263,19 @@ button {
 
 button:hover {
   background: var(--accent-dark);
+}
+
+.contact button {
+  background: var(--deep-text);
+  color: var(--deep);
+}
+
+.contact button:hover {
+  background: #fff;
+}
+
+.contact :focus-visible {
+  outline-color: var(--deep-text);
 }
 
 /* ---------- Footer ---------- */
