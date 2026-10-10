@@ -1,4 +1,4 @@
-# Lena Marsh | Photography Portfolio
+# mohammad Eltegani | Photography Portfolio
 
 A single-page, responsive photography portfolio built with plain HTML5 and CSS3. No frameworks, no JavaScript.
 
