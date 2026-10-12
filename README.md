@@ -1,16 +1,46 @@
-# React + Vite
+# Mohammad Eltegani | Photography Portfolio (React + Tailwind)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Assignment 1 rebuilt with Vite, React and Tailwind CSS. Same content and look, now componentized.
 
-Currently, two official plugins are available:
+**Live site:** _add your link here_
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- Vite + React (JavaScript, no TypeScript)
+- Tailwind CSS v4 via `@tailwindcss/vite`
+- No other libraries; data is hardcoded until Week 3
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Structure
 
-## Expanding the ESLint configuration
+```
+src/
+├── main.jsx
+├── App.jsx
+├── index.css                  # Tailwind import + @theme color variables
+├── data/photos.js             # gallery items (array of objects)
+└── components/
+    ├── Header.jsx
+    ├── Hero.jsx
+    ├── Gallery.jsx            # main grid + category filter (useState)
+    ├── FavoriteButton.jsx     # small controlled component, one per photo
+    ├── About.jsx
+    ├── Contact.jsx
+    └── Footer.jsx
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run it
+
+```
+npm install
+npm run dev
+```
+
+Build for production with `npm run build`.
+
+## Notes
+
+- The filter in `Gallery.jsx` uses `useState` to show one category at a time.
+- `FavoriteButton` is controlled: the parent holds the favorites list and passes `active` and `onToggle`.
+- Classes are written mobile-first (unprefixed, then `sm:`, `md:`, `lg:`).
+- Photos are placeholders from picsum.photos. Replace them in `src/data/photos.js`.
+- The contact form has no backend yet; submitting just shows a thank-you message.
