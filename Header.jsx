@@ -9,7 +9,7 @@ export default function Header() {
     <header className="sticky top-0 z-10 border-b border-line bg-paper">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-4">
         <a href="#top" className="text-xl font-bold no-underline">
-          Lena Marsh
+          Mohammad Eltegani
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">

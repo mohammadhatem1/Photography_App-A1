@@ -6,7 +6,7 @@ export default function About() {
           About
         </h2>
         <p className="max-w-[60ch] text-lg">
-          I'm Lena, a photographer based in Bristol. I shoot landscapes, street scenes and
+          I'm Mohammad, a photographer based in Bristol. I shoot landscapes, street scenes and
           small portrait sessions, and I love early mornings and bad weather.
         </p>
       </div>
