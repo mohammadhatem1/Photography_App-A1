@@ -2,7 +2,7 @@
 
 Assignment 1 rebuilt with Vite, React and Tailwind CSS. Same content and look, now componentized.
 
-**Live site:** _add your link here_
+**Live site:** http://localhost:5173/
 
 ## Stack
 
