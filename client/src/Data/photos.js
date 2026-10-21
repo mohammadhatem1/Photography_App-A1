@@ -1,0 +1,60 @@
+// All gallery items live here. Gallery.jsx maps over this array.
+// layout: "normal" | "tall" | "wide"
+export const photos = [
+  {
+    id: 1,
+    title: "Dawn, Dolomites",
+    category: "Landscape",
+    layout: "tall",
+    src: "https://picsum.photos/id/1018/800/1200",
+    alt: "Misty mountains at dawn",
+  },
+  {
+    id: 2,
+    title: "River bend",
+    category: "Landscape",
+    layout: "normal",
+    src: "https://picsum.photos/id/1015/1200/800",
+    alt: "River winding through a valley",
+  },
+  {
+    id: 3,
+    title: "Forest falls",
+    category: "Water",
+    layout: "normal",
+    src: "https://picsum.photos/id/1039/1200/800",
+    alt: "Waterfall in a green forest",
+  },
+  {
+    id: 4,
+    title: "Coast at dusk",
+    category: "Water",
+    layout: "wide",
+    src: "https://picsum.photos/id/1043/1600/800",
+    alt: "Rocky coastline at dusk",
+  },
+  {
+    id: 5,
+    title: "Still water",
+    category: "Water",
+    layout: "normal",
+    src: "https://picsum.photos/id/1011/1200/800",
+    alt: "Person paddling a canoe",
+  },
+  {
+    id: 6,
+    title: "First snow",
+    category: "Landscape",
+    layout: "tall",
+    src: "https://picsum.photos/id/1036/800/1200",
+    alt: "Snowy pine trees",
+  },
+  {
+    id: 7,
+    title: "Rainy day regular",
+    category: "Street",
+    layout: "normal",
+    src: "https://picsum.photos/id/1025/1200/800",
+    alt: "Pug wrapped in a blanket",
+  },
+];
