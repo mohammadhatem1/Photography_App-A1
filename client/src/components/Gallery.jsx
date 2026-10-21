@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { photos } from "../data/photos.js";
+import { useEffect, useState } from "react";
+import { api } from "../api.js";
 import FavoriteButton from "./FavoriteButton.jsx";
 
 // Full class names so Tailwind can detect them.
@@ -9,12 +9,22 @@ const layoutClasses = {
   wide: "sm:col-span-2",
 };
 
-const categories = ["All", ...new Set(photos.map((photo) => photo.category))];
-
 export default function Gallery() {
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filter, setFilter] = useState("All");
   const [favorites, setFavorites] = useState([]);
 
+  // Load the gallery from the API when the component first appears.
+  useEffect(() => {
+    api("/photos")
+      .then(setPhotos)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ["All", ...new Set(photos.map((photo) => photo.category))];
   const visiblePhotos =
     filter === "All" ? photos : photos.filter((photo) => photo.category === filter);
 
@@ -55,6 +65,9 @@ export default function Gallery() {
             ))}
           </div>
         </div>
+
+        {loading && <p className="text-muted">Loading photos...</p>}
+        {error && <p role="alert" className="text-red-700">Could not load photos: {error}</p>}
 
         <ul className="grid auto-rows-[16rem] grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visiblePhotos.map((photo) => (
