@@ -42,4 +42,47 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
+// POST /api/auth/login
+router.post("/login", async (req, res, next) => {
+  try {
+    const email = String(req.body.email ?? "").trim().toLowerCase();
+    const password = String(req.body.password ?? "");
+
+    const { rows } = await pool.query(
+      "SELECT id, name, email, password_hash FROM users WHERE email = $1",
+      [email]
+    );
+    const user = rows[0];
+    const ok = user && (await bcrypt.compare(password, user.password_hash));
+    if (!ok) return res.status(401).json({ error: "Invalid email or password" });
+
+    await startSession(req, user);
+    res.json({ user: { id: user.id, name: user.name, email: user.email } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/auth/me -> who is signed in (null if nobody). Used on page refresh.
+router.get("/me", async (req, res, next) => {
+  try {
+    if (!req.session.userId) return res.json({ user: null });
+    const { rows } = await pool.query("SELECT id, name, email FROM users WHERE id = $1", [
+      req.session.userId,
+    ]);
+    res.json({ user: rows[0] ?? null });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/auth/logout
+router.post("/logout", (req, res, next) => {
+  req.session.destroy((err) => {
+    if (err) return next(err);
+    res.clearCookie("connect.sid");
+    res.json({ ok: true });
+  });
+});
+
 export default router;
