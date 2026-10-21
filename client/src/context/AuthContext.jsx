@@ -37,6 +37,8 @@ export function AuthProvider({ children }) {
   );
 }
 
+// This hook must stay exported here for existing consumers; it is not a component.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }
