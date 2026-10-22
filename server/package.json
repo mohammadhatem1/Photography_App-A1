@@ -1,20 +1,19 @@
 {
-  "name": "server",
+  "name": "portfolio-server",
+  "private": true,
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
+  "engines": { "node": ">=20.6" },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --watch --env-file=.env src/index.js",
+    "start": "node src/index.js",
+    "seed": "node --env-file=.env src/seed.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "bcryptjs": "^3.0.3",
+    "bcryptjs": "^3.0.2",
     "connect-pg-simple": "^10.0.0",
-    "express": "^5.3.0",
-    "express-session": "^1.19.0",
-    "pg": "^8.23.1"
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "pg": "^8.13.1"
   }
 }
