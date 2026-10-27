@@ -5,7 +5,7 @@ const fieldClass =
   "w-full rounded border border-line bg-white p-3 text-ink";
 
 export default function AuthModal({ onClose }) {
-  const { signup, login } = useAuth();
+  const { signup, login, authMessage } = useAuth();
   const [mode, setMode] = useState("signin"); // "signin" | "signup"
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,6 +44,8 @@ export default function AuthModal({ onClose }) {
             &times;
           </button>
         </div>
+
+        {authMessage && <p className="mb-4 text-muted">{authMessage}</p>}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {mode === "signup" && (

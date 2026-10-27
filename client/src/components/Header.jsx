@@ -1,21 +1,19 @@
-import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import AuthModal from "./AuthModal.jsx";
 
+// "/#..." links also work from the order page, where the sections aren't on screen.
 const links = [
-  { href: "#work", label: "Work" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Book a shoot" },
+  { href: "/#work", label: "Work" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Book a shoot" },
 ];
 
 export default function Header() {
-  const { user, loading, logout } = useAuth();
-  const [showModal, setShowModal] = useState(false);
+  const { user, loading, logout, openAuth } = useAuth();
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-paper">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-4">
-        <a href="#top" className="text-xl font-bold no-underline">
+        <a href="/#top" className="text-xl font-bold no-underline">
           Mohammad Eltegani
         </a>
         <nav aria-label="Main" className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -47,7 +45,7 @@ export default function Header() {
             ) : (
               <button
                 type="button"
-                onClick={() => setShowModal(true)}
+                onClick={() => openAuth()}
                 className="cursor-pointer rounded bg-accent px-3 py-1 text-white hover:bg-accent-dark"
               >
                 Sign in
@@ -55,8 +53,6 @@ export default function Header() {
             ))}
         </nav>
       </div>
-
-      {showModal && <AuthModal onClose={() => setShowModal(false)} />}
     </header>
   );
 }
