@@ -33,10 +33,11 @@ export default function App() {
             <Gallery />
             <About />
             <Contact />
+            <Footer />
           </>
         )}
       </main>
-      <Footer />
+      
       {authOpen && <AuthModal onClose={closeAuth} />}
     </>
   );

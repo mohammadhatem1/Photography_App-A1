@@ -8,11 +8,14 @@ const formatPrice = (cents) => `$${(cents / 100).toFixed(2)}`;
 export default function OrderSuccess({ orderId }) {
   const { user, loading, openAuth } = useAuth();
   const [order, setOrder] = useState(null);
-  const [error, setError] = useState("");
-  const [gaveUp, setGaveUp] = useState(false);
+  const [errorState, setErrorState] = useState(null);
+  const [gaveUpFor, setGaveUpFor] = useState(null);
   const [round, setRound] = useState(0); // bump to start checking again
 
   const userId = user?.id;
+  const checkKey = `${userId}:${orderId}:${round}`;
+  const error = errorState?.key === checkKey ? errorState.message : "";
+  const gaveUp = gaveUpFor === checkKey;
 
   // The webhook can arrive a moment after the redirect, so keep asking
   // the server while the order is still "pending".
@@ -20,9 +23,6 @@ export default function OrderSuccess({ orderId }) {
     if (!userId) return;
     let cancelled = false;
     let timer;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setGaveUp(false);
-    setError("");
 
     async function check(attempt) {
       try {
@@ -31,10 +31,10 @@ export default function OrderSuccess({ orderId }) {
         setOrder(data);
         if (data.status === "pending") {
           if (attempt < MAX_CHECKS) timer = setTimeout(() => check(attempt + 1), 2000);
-          else setGaveUp(true);
+          else setGaveUpFor(checkKey);
         }
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) setErrorState({ key: checkKey, message: err.message });
       }
     }
 
@@ -43,7 +43,7 @@ export default function OrderSuccess({ orderId }) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [userId, orderId, round]);
+  }, [userId, orderId, round, checkKey]);
 
   let content;
   if (loading) {

@@ -1,6 +1,6 @@
 # Mohammad Eltegani | Photography Portfolio
 
-A full-stack photography portfolio. The gallery is loaded from a Postgres database through a custom API, and visitors can create an account, sign in and stay signed in across page refreshes.
+A full-stack photography portfolio with a database-backed gallery, user accounts, saved favorites, and real print orders paid through Stripe Checkout (test mode).
 
 - **Live site:** https://photography-app-a1.vercel.app/
 - **API:** https://photography-app-a1.onrender.com (try `/api/health` and `/api/photos`)
@@ -11,9 +11,10 @@ A full-stack photography portfolio. The gallery is loaded from a Postgres databa
 
 - Responsive photo gallery grid (`object-fit: cover`) loaded from the database
 - Category filter built with `useState`
-- Favorite button on each photo (a controlled, reusable component)
-- Real signup, login and logout with sessions that survive a refresh
-- Header shows "Sign in" or "Hi, name / Sign out" depending on state
+- Signup, login and logout, with sessions that survive a page refresh
+- Favorites saved to the database per user (sign-in required)
+- Order a print of any photo with Stripe Checkout (test mode)
+- Order confirmation page that waits for the payment webhook
 - "Book a shoot" contact form
 - Mobile-first layout with no horizontal scroll
 
@@ -25,52 +26,70 @@ A full-stack photography portfolio. The gallery is loaded from a Postgres databa
 | Backend | Node.js, Express |
 | Database | PostgreSQL (Neon) via the `pg` library |
 | Auth | `bcryptjs` for password hashing, `express-session` with `connect-pg-simple` for sessions |
+| Payments | Stripe Checkout and Stripe webhooks (test mode) |
 | Hosting | Vercel (frontend), Render (API), Neon (database) |
 
 ## Project structure
 
 ```
 .
-├── client/                    React app
+├── client/                         React app
 │   ├── index.html
-│   ├── vite.config.js         dev proxy: /api -> http://localhost:3001
-│   ├── vercel.json            production rewrite: /api -> the live API
+│   ├── vite.config.js              dev proxy: /api -> http://localhost:3001
+│   ├── vercel.json                 production rewrite: /api -> the live API
 │   └── src/
 │       ├── main.jsx
-│       ├── App.jsx
-│       ├── api.js             fetch helper used by every request
-│       ├── index.css          Tailwind import + theme colors
-│       ├── context/AuthContext.jsx    who is signed in, shared app-wide
-│       └── components/        Header, Hero, Gallery, FavoriteButton,
-│                              AuthModal, About, Contact, Footer
-└── server/                    Express API
+│       ├── App.jsx                 page layout; shows the order page when the URL has ?order=ID
+│       ├── api.js                  fetch helper used by every request
+│       ├── index.css               Tailwind import + theme colors
+│       ├── context/AuthContext.jsx who is signed in + sign-in modal state
+│       └── components/             Header, Hero, Gallery, FavoriteButton, AuthModal,
+│                                   OrderSuccess, About, Contact, Footer
+└── server/                         Express API
     └── src/
-        ├── index.js           app setup, sessions, route mounting
-        ├── db.js              Postgres connection pool
-        ├── schema.sql         table definitions
-        ├── seed.js            creates tables and loads the photos
-        ├── seedData.js        the gallery data
+        ├── index.js                app setup, sessions, route mounting
+        ├── db.js                   Postgres connection pool
+        ├── schema.sql              table definitions
+        ├── seed.js                 creates tables and loads/updates the photos
+        ├── seedData.js             gallery data and print prices
+        ├── lib/stripe.js           Stripe client
+        ├── middleware/requireAuth.js   blocks requests from signed-out visitors
         └── routes/
-            ├── photos.js      GET /api/photos
-            └── auth.js        signup, login, me, logout
+            ├── photos.js           GET /api/photos
+            ├── auth.js             signup, login, me, logout
+            ├── favorites.js        list, add, remove favorites
+            ├── checkout.js         creates a pending order + Stripe Checkout Session
+            ├── webhook.js          Stripe webhook: the only place orders become paid
+            └── orders.js           look up one of your own orders
 ```
 
 ## API
 
-| Method | Route | Description |
-| --- | --- | --- |
-| GET | `/api/health` | Health check |
-| GET | `/api/photos` | All gallery photos as JSON |
-| POST | `/api/auth/signup` | Create an account and sign in |
-| POST | `/api/auth/login` | Sign in |
-| GET | `/api/auth/me` | The signed-in user, or `null` |
-| POST | `/api/auth/logout` | Sign out |
+| Method | Route | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/health` | no | Health check |
+| GET | `/api/photos` | no | All gallery photos, including print price |
+| POST | `/api/auth/signup` | no | Create an account and sign in |
+| POST | `/api/auth/login` | no | Sign in |
+| GET | `/api/auth/me` | no | The signed-in user, or `null` |
+| POST | `/api/auth/logout` | no | Sign out |
+| GET | `/api/favorites` | yes | Photo ids the user favorited |
+| PUT | `/api/favorites/:photoId` | yes | Add a favorite |
+| DELETE | `/api/favorites/:photoId` | yes | Remove a favorite |
+| POST | `/api/checkout` | yes | Create a pending order and a Stripe Checkout Session |
+| GET | `/api/orders/:id` | yes | One of the user's own orders, with its items |
+| POST | `/api/stripe/webhook` | Stripe signature | Called by Stripe only; marks orders as paid |
 
 ## Database
 
 - **users**: one row per person, with `name`, a unique `email`, and a hashed password. The real password is never stored.
-- **photos**: one row per gallery picture, with `title`, `category`, `layout` (normal, tall or wide), `src` (image link) and `alt` text.
+- **photos**: one row per gallery picture, with `title`, `category`, `layout` (normal, tall or wide), `src` (image link), `alt` text and `price_cents` (the print price in cents).
+- **favorites**: which user favorited which photo (one row per pair).
+- **orders**: one row per purchase, with the user, a `status` (`pending`, `paid`, `expired` or `failed`), the total in cents, the Stripe session id and when it was paid.
+- **order_items**: what was bought in each order, with the quantity and the unit price at the time of purchase, so later price changes don't alter past orders.
 - **session**: created automatically by `connect-pg-simple`. It remembers who is signed in, which is why a refresh doesn't log you out.
+
+Ids are generated by Postgres sequences and are never reused, so gaps (for example 1, then 4) are expected.
 
 ## How authentication works
 
@@ -82,6 +101,20 @@ A full-stack photography portfolio. The gallery is loaded from a Postgres databa
 
 In production, the browser only calls `/api/...` on the Vercel domain, and Vercel forwards those requests to the API (`client/vercel.json`). That keeps the cookie first-party, so browsers don't block it.
 
+Routes that need a signed-in user (favorites, checkout, orders) are protected by the `requireAuth` middleware, which returns `401` otherwise.
+
+## How payments work
+
+1. A signed-in user clicks **Order print**. The browser sends only the photo id to `POST /api/checkout`.
+2. The server looks up the real price in the database (never trusting a price from the browser), saves a `pending` order and its item, and creates a Stripe Checkout Session.
+3. The browser is redirected to Stripe's hosted checkout page and pays.
+4. Stripe calls `POST /api/stripe/webhook`. After verifying Stripe's signature, the server marks the order `paid`. **This is the only code that can do that.**
+5. Stripe sends the customer back to `/?order=ID`. The order page asks `GET /api/orders/:id` every couple of seconds until the status is `paid`.
+
+The webhook route is mounted before `express.json()` because Stripe's signature is calculated on the raw request body.
+
+Stripe is in **test mode**: no real money moves. Use card `4242 4242 4242 4242`, any future date and any CVC.
+
 ## Environment variables
 
 Secrets live in `server/.env`, which is git-ignored. Copy `server/.env.example` and fill it in:
@@ -90,22 +123,30 @@ Secrets live in `server/.env`, which is git-ignored. Copy `server/.env.example` 
 | --- | --- |
 | `DATABASE_URL` | Neon Postgres connection string |
 | `SESSION_SECRET` | Long random string used to sign session cookies |
+| `STRIPE_SECRET_KEY` | Stripe test-mode secret key (`sk_test_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret for the webhook (`whsec_...`) |
+| `CLIENT_URL` | Frontend URL that Stripe redirects back to, with no trailing slash |
 | `PORT` | API port (defaults to 3001) |
 | `NODE_ENV` | Set to `production` on the host so cookies are marked secure |
 
 ## Run locally
 
-You need Node 20.6 or newer and a free Neon database.
+You need Node 20.6 or newer, a free Neon database, a Stripe account in test mode, and the [Stripe CLI](https://docs.stripe.com/stripe-cli).
 
 ```
 # 1. API
 cd server
-cp .env.example .env        # then fill in DATABASE_URL and SESSION_SECRET
+cp .env.example .env        # then fill in the values above
 npm install
 npm run seed                # creates tables and loads the photos
 npm run dev                 # http://localhost:3001
 
-# 2. Frontend (in a second terminal)
+# 2. Stripe webhooks (second terminal)
+stripe login
+stripe listen --forward-to localhost:3001/api/stripe/webhook
+# copy the whsec_... it prints into STRIPE_WEBHOOK_SECRET, then restart the API
+
+# 3. Frontend (third terminal)
 cd client
 npm install
 npm run dev                 # http://localhost:5173
@@ -114,11 +155,13 @@ npm run dev                 # http://localhost:5173
 ## Deployment
 
 - **Database:** Neon free Postgres project.
-- **API (Render):** Web Service with Root Directory `server`, Build Command `npm install`, Start Command `npm start`, and the environment variables above.
+- **API (Render):** Web Service with Root Directory `server`, Build Command `npm install`, Start Command `npm start`, and all the environment variables above (`CLIENT_URL` is the Vercel URL).
 - **Frontend (Vercel):** Root Directory `client`, Vite preset. `client/vercel.json` rewrites `/api/*` to the API URL.
+- **Stripe webhook:** in the Stripe dashboard, add an endpoint at `https://YOUR-API-URL/api/stripe/webhook` for the events `checkout.session.completed` and `checkout.session.expired`, and use its signing secret as `STRIPE_WEBHOOK_SECRET` on Render.
 
 ## Notes
 
-- Gallery images are placeholders from picsum.photos and can be swapped in `server/src/seedData.js` (then run `npm run seed` again).
+- Gallery images are placeholders from picsum.photos. Photos and prices can be changed in `server/src/seedData.js`, then run `npm run seed` again (it updates photos without touching orders).
+- Checking out and then canceling leaves an order as `pending` until Stripe expires the session, when the webhook sets it to `expired`.
 - The contact form does not send anything yet; submitting it shows a thank-you message.
 - I moved the API from Railway to Render during a Railway outage; the code did not need to change.

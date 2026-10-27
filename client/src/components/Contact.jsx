@@ -7,7 +7,7 @@ export default function Contact() {
   const [sent, setSent] = useState(false);
 
   function handleSubmit(event) {
-    event.preventDefault(); // no backend yet (Week 3)
+    event.preventDefault();
     setSent(true);
   }
 
