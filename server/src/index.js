@@ -5,6 +5,7 @@ import { pool } from "./db.js";
 import photosRouter from "./routes/photos.js";
 import authRouter from "./routes/auth.js";
 import favoritesRouter from "./routes/favorites.js";
+import checkoutRouter from "./routes/checkout.js";
 import process from "node:process";
 
 if (!process.env.DATABASE_URL || !process.env.SESSION_SECRET) {
@@ -41,6 +42,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/photos", photosRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/favorites", favoritesRouter);
+app.use("/api/checkout", checkoutRouter);
 
 app.use("/api", (req, res) => res.status(404).json({ error: "Not found" }));
 
